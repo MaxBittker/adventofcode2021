@@ -1,37 +1,42 @@
-
-(ns aoc.one
-  (:require-macros lumo.util)
-  (:require [clojure.string :as string]
-            [clojure.set :as set]
-            [cljs.js :as cljs]
-            [cljs.compiler :as comp]
-            [cljs.reader :as edn]
-            [goog.string :as gstring]
-            [lumo.io :as io]
-            fs
-            path
-            os))
+(require '[planck.core :refer [line-seq with-open]]
+         '[planck.io :as io]
+         '[planck.core :as core]
+         '[planck.shell :as shell]
+         '[clojure.string :as string])
 
 (def input
   (string/split
-  ;  (io/slurp "./example_input1.txt")
-   (io/slurp "./input1.txt")
+   (core/slurp "./1.txt")
    #"\n"))
 
 (def values
   (map #(js/parseInt % 10) input))
 
-(def freqs
-  (reductions + (cycle  values)))
 
-(def distinct-freqs
-  (map vector
-       (distinct freqs)
-       freqs))
+(def pairs
+ (partition 2 1 values))
 
-(println
- (second
-  (first
-   (filter
-    #(not (apply = %))
-    distinct-freqs))))
+(def triplets 
+  (partition 3 1 values))
+
+(def increasing
+  (filter
+   (fn [[a b]] (> 0 (- a b)))
+   pairs))
+
+(println (count increasing))
+
+(def sums 
+  (map 
+   (fn [t] (reduce + t))
+  triplets))
+
+(def sum-pairs
+  (partition 2 1 sums))
+
+(def increasing-triplets
+  (filter
+   (fn [[a b]] (> 0 (- a b)))
+   sum-pairs))
+
+(println (count increasing-triplets))
